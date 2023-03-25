@@ -4,12 +4,16 @@ services:
     build: ./currywurst_machine_api
     ports:
       - 3003:80 # computer:container
+    depends_on:
+      - redis
 
   
   transactions-history-manager:
     build: ./transactions_history_manager
+    volumes:
+      - ./data:/code/app/data
     depends_on:
       - redis
-  
+ 
   redis:
     image: redis:latest

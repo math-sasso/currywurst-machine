@@ -15,7 +15,8 @@ async def pay(payment: Payment):
             eur_inserted=payment.eur_inserted
         )
 
-        response = {"status": "success", "returned_coins": returned_coins, "error_code": None}
+        machine_id = 123456 # Can come from other place. 
+        response = {"machine_id":machine_id,"status": "success", "returned_coins": returned_coins, "error_code": None}
         redis_publisher.publish_purchase(params=response)
         return response
     

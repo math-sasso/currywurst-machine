@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 # 
 COPY ./src /code/app
 
-CMD ["python3", "app/subscriber.py"]
+CMD ["python3", "app/main.py"]
