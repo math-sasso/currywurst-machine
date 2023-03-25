@@ -1,0 +1,15 @@
+services:
+
+  currywurst-machine-api:
+    build: ./currywurst_machine_api
+    ports:
+      - 3003:80 # computer:container
+
+  
+  transactions-history-manager:
+    build: ./transactions_history_manager
+    depends_on:
+      - redis
+  
+  redis:
+    image: redis:latest
