@@ -1,7 +1,8 @@
-
 import json
 from redis import Redis
 from typing import Dict
+
+
 class RedisPublisher:
     """Send message to redis queue."""
 
@@ -25,6 +26,6 @@ class RedisPublisher:
 
     def publish_purchase(self, params: Dict) -> None:
         """Send dict message to the redis queue."""
-       
+
         jparams = json.dumps(params)
         self.redis_conn.publish("purchases-channel", jparams)

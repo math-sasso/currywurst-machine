@@ -4,7 +4,8 @@ from sqlalchemy.orm import sessionmaker
 
 
 from pathlib import Path
-Path.mkdir(Path.cwd()/"app/data",exist_ok=True,parents=True)
+
+Path.mkdir(Path.cwd() / "app/data", exist_ok=True, parents=True)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///" + "/code/app/data/mydb.sqlite"
 
@@ -15,4 +16,3 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = SessionLocal()
 
 Base = declarative_base()
-
