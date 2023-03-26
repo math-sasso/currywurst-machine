@@ -7,7 +7,7 @@ from .machine import CurrywurstMachine
 from .payloads import Payment
 from .redis_publisher import RedisPublisher
 from .custom_exceptions import (
-    InsuficientFundsException,
+    InsuficientInsertedMoneyException,
     NotExactChangeAvailableException,
 )
 
@@ -50,9 +50,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         },
     )
 
+@app.post("/refill_coins")
+async def pay():
+    cw_machine.refill_coins()
 
 @app.post("/pay")
-async def pay(payment: Payment)-> Dict:
+async def pay(payment: Payment):
     try:
         returned_coins = cw_machine.return_coins(
             currywurst_price=payment.currywurst_price, eur_inserted=payment.eur_inserted
@@ -65,7 +68,14 @@ async def pay(payment: Payment)-> Dict:
             "error_msg": None,
         }
         redis_publisher.publish_purchase(params=response)
-        return response
+        return JSONResponse(
+            content = response,
+            status_code= status.HTTP_200_OK
+            )
 
-    except (InsuficientFundsException, NotExactChangeAvailableException) as e:
-        return {"status": "failed", "returned_coins": None, "error_msg": str(e)}
+    except (InsuficientInsertedMoneyException, NotExactChangeAvailableException) as e:
+        
+        return JSONResponse(
+            content = {"machine_id": machine_id,"status": "failed", "returned_coins": None, "error_msg": str(e)},
+            status_code= status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

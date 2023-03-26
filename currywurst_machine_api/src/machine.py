@@ -1,45 +1,57 @@
 from typing import Dict
 from .custom_exceptions import (
-    InsuficientFundsException,
+    InsuficientInsertedMoneyException,
     NotExactChangeAvailableException,
 )
 
+class CurrywurstMachine:
+    
 
-class CoinWallet:
-    def __init__(self):
+    def __init__(self) -> None:
+
+        self.refil_value = 500
+
         self.coins = {
-            2: 100,
-            1: 100,
-            0.5: 100,
-            0.2: 100,
-            0.1: 100,
-            0.05: 100,
-            0.02: 100,
-            0.01: 100,
+            2: self.refil_value,
+            1: self.refil_value,
+            0.5: self.refil_value,
+            0.2: self.refil_value,
+            0.1: self.refil_value,
+            0.05: self.refil_value,
+            0.02: self.refil_value,
+            0.01: self.refil_value,
         }
 
-    def get_empty_coin_dict(self):
-        return {coin: 0 for coin in self.coins.keys()}
+        self.notes = {
+            5: 0,
+            10: 0,
+            20: 0,
+            50: 0,
+            100: 0,
+            200: 0,
+            500: 0,
+        }
+     
+    def __get_eur_notes_inserted(self, eur_inserted:Dict)->Dict[float,int]:
+        notes = {}
 
-    def get_coin_possitilities(self):
-        return list(self.coins.keys())
-
-    def insert_coin(self, coin: float):
-        self.coins[coin] += 1
-
-    def remove_coin(self, coin: float):
-        self.coins[coin] -= 1
-
-    def check_if_coin_is_available(self, coin: float):
-        if self.coins[coin] == 0:
+        for key, value in eur_inserted.items():
+            if key > 2:
+                notes[key] = value
+        
+        return notes
+    
+    def __check_if_coin_is_available(self, coin: float, coins_dict:Dict):
+        if coins_dict[coin] == 0:
             return False
         return True
+    
+    def __get_empty_coin_dict(self):
+        return {coin: 0 for coin in self.coins.keys()}
 
-
-class CurrywurstMachine:
-    def __init__(self) -> None:
-        self.coin_wallet = CoinWallet()
-        
+    def __get_coin_possitilities(self):
+        return list(self.coins.keys())
+    
     def __check_suficient_funds(self, currywurst_price: float, eur_inserted: Dict):
         # Calculate the amount of change required
         amount_inserted = sum(k * v for k, v in eur_inserted.items())
@@ -47,17 +59,11 @@ class CurrywurstMachine:
 
         # If the user inserted insufficient funds, raise an exception
         if change < 0:
-            raise InsuficientFundsException("Insufficient funds")
+            raise InsuficientInsertedMoneyException("Insufficient money inserted")
 
         return change
 
     def __check_if_exact_change_available(self, change: float):
-        # Iterate over the possible Euro coins in descending order
-        for coin in sorted(self.coin_wallet.get_coin_possibilities(), reverse=True):
-            # Count the number of times the current coin can be used for change
-            while change >= coin:
-                change -= coin
-
         # Check if exact change was given
         if change != 0:
             raise NotExactChangeAvailableException("Exact change not possible")
@@ -67,28 +73,28 @@ class CurrywurstMachine:
          The currywurst machine accepts any coins or banknotes but returns only
         coins and works only with EUR currency.
         """
-        import pdb;pdb.set_trace()
-  
-        # Initialize a dictionary to keep track of the number of coins needed for change
-        coin_counts = self.coin_wallet.get_empty_coin_dict()
 
         # Calculates change and raise exception if funds are not suficient
         change = self.__check_suficient_funds(
             currywurst_price=currywurst_price, eur_inserted=eur_inserted
         )
 
-        import pdb;pdb.set_trace()
-
         # Calculate the quantity of each coin required
-        self.coin_wallet.coins.copy()
-        for coin in sorted(self.coin_wallet.get_coin_possitilities(),reverse=True):
-            while change >= coin and self.coin_wallet.check_if_coin_is_available(coin):
-                self.coin_wallet.remove_coin(coin=coin)
-                coin_counts[coin] += 1
+        coin_counts = {}
+        coins_copy = self.coins.copy()
+        for coin in sorted(self.__get_coin_possitilities(),reverse=True):
+            coin_counts[coin] = 0
+            while change >= coin and self.__check_if_coin_is_available(coin=coin,coins_dict=coins_copy):
+                coin_counts[coin] +=1
+                coins_copy[coin] -=1
                 change -= coin
+        change= round(change,2)
+
+        # check if exact change available
+        self.__check_if_exact_change_available(change)
+
+        # update attributes
+        self.coins = coins_copy
+        self.notes = self.__get_eur_notes_inserted(eur_inserted=eur_inserted)
         
-        import pdb;pdb.set_trace()
-
-        # self.__check_if_exact_change_available(change)
-
         return coin_counts

@@ -13,7 +13,6 @@ def test_pay_success(empty_eur_inserted, currywurst_price):
     )
     
     response = client.post("/pay", json=payment.dict())
-    import pdb;pdb.set_trace()
     assert response.status_code == 200
     assert response.json() == {
         "machine_id": 123456,
@@ -32,18 +31,50 @@ def test_pay_success(empty_eur_inserted, currywurst_price):
     }
 
 
-# def test_bad_empty_eur_inserted_payload(empty_eur_inserted, currywurst_price):
-#     empty_eur_inserted[0.51] = 1
-#     payment_json = {
-#         "eur_inserted": empty_eur_inserted,
-#         "currywurst_price": currywurst_price,
-#     }
-#     response = client.post("/pay", json=payment_json)
+def test_bad_empty_eur_inserted_payload_fail(empty_eur_inserted, currywurst_price):
+    empty_eur_inserted[0.51] = 1
+    payment_json = {
+        "eur_inserted": empty_eur_inserted,
+        "currywurst_price": currywurst_price,
+    }
+    response = client.post("/pay", json=payment_json)
 
-#     assert response.status_code == 400
-#     assert response.json() == {
-#         "machine_id": 123456,
-#         "status": "failed",
-#         "returned_coins": None,
-#         "error_msg": "Invalid coin/note value: 0.51",
-#     }
+    assert response.status_code == 400
+    assert response.json() == {
+        "machine_id": 123456,
+        "status": "failed",
+        "returned_coins": None,
+        "error_msg": "Invalid coin/note value: 0.51",
+    }
+
+
+def test_no_change_available_fail(empty_eur_inserted, currywurst_price):
+    empty_eur_inserted[500] = 1000
+    payment_json = {
+        "eur_inserted": empty_eur_inserted,
+        "currywurst_price": currywurst_price,
+    }
+    response = client.post("/pay", json=payment_json)
+
+    assert response.status_code == 500
+    assert response.json() == {
+        "machine_id": 123456,
+        "status": "failed",
+        "returned_coins": None,
+        "error_msg": "Exact change not possible",
+    }
+
+def test_money_inserted_not_enough_fail(empty_eur_inserted, currywurst_price):
+    empty_eur_inserted[1] = 1
+    payment_json = {
+        "eur_inserted": empty_eur_inserted,
+        "currywurst_price": currywurst_price,
+    }
+    response = client.post("/pay", json=payment_json)
+    assert response.status_code == 500
+    assert response.json() == {
+        "machine_id": 123456,
+        "status": "failed",
+        "returned_coins": None,
+        "error_msg": "Insufficient money inserted",
+    }

@@ -1,4 +1,4 @@
-class InsuficientFundsException(Exception):
+class InsuficientInsertedMoneyException(Exception):
     """Exception raised when funds are not sufficient."""
 
 
