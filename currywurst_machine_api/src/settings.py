@@ -13,5 +13,5 @@ EURO_ACCEPTABLE_VALUES = {
     0.10,
     0.05,
     0.02,
-    0.01
+    0.01,
 }

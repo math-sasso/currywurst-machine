@@ -1,10 +1,12 @@
+import os
+
 import database
 import models
 import redis
 from sqlalchemy.orm.session import Session
-import os
 
-def run_subscriber_loop(subscriber:redis.client.PubSub, session:Session)-> None:
+
+def run_subscriber_loop(subscriber: redis.client.PubSub, session: Session) -> None:
     """
     Runs a subscriber loop that listens for messages from a Redis PubSub channel and adds them to the database as new message rows.
 
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     client = redis.Redis(host=os.getenv("REDIS_SERVICE", "redis"), port=6379)
     subscriber = client.pubsub()
     subscriber.subscribe(
-        os.getenv("MESSAGE_QUEUE","transaction_logs")
+        os.getenv("MESSAGE_QUEUE", "transaction_logs")
     )  # {'type': 'subscribe', 'pattern': None, 'channel': b'purchases-channel', 'data': 1}
 
     # Run watching loop

@@ -1,7 +1,9 @@
 import json
-from redis import Redis
-from typing import Dict
 import os
+from typing import Dict
+
+from redis import Redis
+
 
 class RedisPublisher:
     """Send message to redis queue."""

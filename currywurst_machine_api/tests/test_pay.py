@@ -15,21 +15,21 @@ def test_pay_success(empty_eur_inserted, currywurst_price):
     payment = Payment(
         currywurst_price=currywurst_price, eur_inserted=empty_eur_inserted
     )
-    
+
     response = client.post("/pay", json=payment.dict())
     assert response.status_code == 200
     assert response.json() == {
         "machine_id": 123456,
         "status": "success",
         "returned_coins": {
-            '2': 1,
-            '1': 1,
-            '0.5': 1,
-            '0.2': 1,
-            '0.1': 0,
-            '0.05': 1,
-            '0.02': 1,
-            '0.01': 0,
+            "2": 1,
+            "1": 1,
+            "0.5": 1,
+            "0.2": 1,
+            "0.1": 0,
+            "0.05": 1,
+            "0.02": 1,
+            "0.01": 0,
         },
         "error_msg": None,
     }
@@ -73,6 +73,7 @@ def test_no_change_available_fail(empty_eur_inserted, currywurst_price):
         "returned_coins": None,
         "error_msg": "Exact change not possible",
     }
+
 
 def test_money_inserted_not_enough_fail(empty_eur_inserted, currywurst_price):
     """Test that insufficient money is handled correctly.
