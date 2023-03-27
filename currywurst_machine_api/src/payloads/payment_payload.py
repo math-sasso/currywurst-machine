@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Dict
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, validator
 from ..custom_exceptions import (
     EuroPrecisionMoreThanTwoDecimalsException,
     InvalidCoinNoteException,

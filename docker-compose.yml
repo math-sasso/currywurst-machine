@@ -4,6 +4,8 @@ services:
     build: ./currywurst_machine_api
     ports:
       - 3003:80 # computer:container
+    env_file:
+      - env_file.env
     depends_on:
       - redis
 
@@ -12,8 +14,11 @@ services:
     build: ./transactions_history_manager
     volumes:
       - ./data:/code/app/data
+    env_file:
+      - env_file.env
     depends_on:
       - redis
+    
  
   redis:
     image: redis:latest

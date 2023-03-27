@@ -1,7 +1,7 @@
 import json
 from redis import Redis
 from typing import Dict
-
+import os
 
 class RedisPublisher:
     """Send message to redis queue."""
@@ -17,7 +17,7 @@ class RedisPublisher:
         ----------
         redis_host : str
             Redis host
-        redis_port : str
+        redis_port : int
             Redis port
         """
         self.redis_host = redis_host
@@ -25,7 +25,14 @@ class RedisPublisher:
         self.redis_conn = Redis(host=self.redis_host, port=self.redis_port)
 
     def publish_purchase(self, params: Dict) -> None:
-        """Send dict message to the redis queue."""
+        """Publishes a purchase message to a Redis channel.
+
+        Args:
+            params (Dict): A dictionary containing the purchase parameters.
+
+        Returns:
+            None
+        """
 
         jparams = json.dumps(params)
-        self.redis_conn.publish("purchases-channel", jparams)
+        self.redis_conn.publish(os.getenv("MESSAGE_QUEUE", "transaction_logs"), jparams)
