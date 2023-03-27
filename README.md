@@ -34,12 +34,12 @@ docker compose up --build -d
 
 To check what is inside the table type:
 ```
-sqlite3 data/mydb.sqlite
+sqlite3 data/currywurst_machine.sqlite
 ```
 And next:
 
 ```
-select * from currywurst_machine_logs;
+select * from transactions;
 ```
 
 If for some reason the user cannot read the table due to permission , simply perform the command below:
